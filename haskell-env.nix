@@ -1,5 +1,3 @@
-#My Haskell Nix Environment for VScode. Run nix-shell in terminal and access ghci
-
 { pkgs ? import <nixpkgs> {} }:
 
 with pkgs;
@@ -10,6 +8,7 @@ let
   ghc-with-packages = haskellPackages.ghcWithPackages my-haskell-packages;
   nixPackages = [
     gdb
+    stack
   ];
 in
   pkgs.mkShell {

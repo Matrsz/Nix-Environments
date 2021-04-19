@@ -10,12 +10,10 @@
       ./hardware-configuration.nix
     ];
 
-  # Use the systemd-boot EFI boot loader.
-  # boot.loader.systemd-boot.enable = true;
+  # Configure grub EFI boot loader.
   boot.loader.efi.canTouchEfiVariables = true;
   boot.loader.grub.enable = true;
   boot.loader.grub.devices = [ "nodev" ];
-  #  boot.loader.grub.efiInstallAsRemovable = true;
   boot.loader.grub.efiSupport = true;
   boot.loader.grub.useOSProber = true;
   
@@ -23,11 +21,6 @@
   system.autoUpgrade.channel = "https://nixos.org/channels/nixos-unstable/";
 
   # networking.hostName = "nixos"; # Define your hostname.
-  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
-
-  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-  # Per-interface useDHCP will be mandatory in the future, so this generated config
-  # replicates the default behaviour.
   networking.networkmanager.enable = true;
 
   # Configure network proxy if necessary
@@ -40,38 +33,34 @@
    font = "Lat2-Terminus16";
    keyMap = "us";
  };
+  #Set the timezone
+  time.timeZone = "America/Argentina/Mendoza";
 
-  # Set your time zone.
- time.timeZone = "America/Argentina/Mendoza";
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-
+  #Declare installed system packages
   environment.systemPackages = with pkgs; [
     wget 
-    nano 
+    nano
+    gnumake
+    gcc-unwrapped
     neofetch
     htop
+    gparted
     ark
+    okular
+    xfce.mousepad
     firefox 
+    vscode
     arc-theme
-    arc-icon-theme
     arc-kde-theme
-    # vscode
     git
+    discord
+    vscode
+    python3
+    ansible
   ];
 
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = {
-  #   enable = true;
-  #   enableSSHSupport = true;
-  #   pinentryFlavor = "gnome3";
-  # };
-
-  # List services that you want to enable:
-
+  programs.steam.enable = true;
+  
   # Enable the OpenSSH daemon.
   # services.openssh.enable = true;
 
@@ -85,35 +74,27 @@
   # services.printing.enable = true;
 
   # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
   sound.enable = true;
   hardware.pulseaudio.enable = true;
   hardware.pulseaudio.support32Bit = true;
 
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
-  # services.xserver.layout = "us";
-  # services.xserver.xkbOptions = "eurosign:e";
-
-  # Enable touchpad support.
-  # services.xserver.libinput.enable = true;
-
+  
   # Enable the KDE Desktop Environment.
-  services.xserver.displayManager.lightdm.enable = true;
-  # services.xserver.desktopManager.xfce.enable = true;
-  services.xserver.desktopManager.plasma5.enable = true;
+   services.xserver.displayManager.gdm.enable = true;
+   services.xserver.desktopManager.plasma5.enable = true;
 
+  # Enable the X11 windowing system
   services.xserver.enable = true;
   services.xserver.layout = "us";
-  # services.xserver.xkbOptions = "eurosign:e";
-
-  # Enable touchpad support.
-  # services.xserver.libinput.enable = true;
-
 
   users.users.inox = {
     isNormalUser = true;
+    home = "/home/inox";
+    extraGroups = [ "wheel" "network" ]; # Enable ‘sudo’ for the user.
+  };
+  users.users.lucy = {
+    isNormalUser = true;
+    home = "/home/lucy";
     extraGroups = [ "wheel" "network" ]; # Enable ‘sudo’ for the user.
   };
 
@@ -125,5 +106,13 @@
   # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
   system.stateVersion = "20.03"; # Did you read the comment?
 
+  #Allow installation of unfree packages
   nixpkgs.config.allowUnfree = true;
+  
+  #Enable automatic garbage collection
+  nix.gc = {
+	automatic = true;
+        dates = "daily";
+        options = "-- delete-older-than 7d";
+  };
 }
